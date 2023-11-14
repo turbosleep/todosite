@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fira-code@3.2.1/dist/fira-code.css" >
+    <style>
+        body {
+            font-family: 'Fira Code', monospace;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 70%;
+        }
+        button {
+            padding: 10px;
+            cursor: pointer;
+            background-color: white;
+            color: black;
+            border: 1px solid black;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .todo-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* Styles for the new button */
+        #randomTodoButton {
+            padding: 10px;
+            cursor: pointer;
+            background-color: white;
+            color: black;
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Todo List</h1>
+    </header>
+    <main>
+        <input type="text" id="todoInput" placeholder="Add a new todo">
+        <button onclick="addTodo()" id="addTodoButton">Add Todo</button>
+        <button id="randomTodoButton" onclick="chooseRandomTodo()">Choose Random Todo</button>
+        <div id="todoList"></div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load todos from local storage
+            loadTodos();
+            console.log("Website Live - Port:", window.location.port);
+        });
+
+        function addTodo() {
+            var todoInput = document.getElementById('todoInput');
+            var todoList = document.getElementById('todoList');
+
+            if (todoInput.value.trim() !== '') {
+                // Create todo item
+                var todoItem = document.createElement('div');
+                todoItem.className = 'todo-item';
+                var taskId = generateTaskId();
+                todoItem.innerHTML = `
+                    <span>${todoInput.value}</span>
+                    <button onclick="removeTodo(this)" data-task-id="${taskId}">Removes</button>
+                `;
+
+                // Append todo item to the list
+                todoList.appendChild(todoItem);
+
+                // Save todos to local storage
+                saveTodos();
+
+                // Log task made
+                console.log("Task Made - ID:", taskId);
+
+                // Clear input field
+                todoInput.value = '';
+            }
+        }
+
+        function removeTodo(button) {
+            var todoItem = button.parentNode;
+            var todoList = document.getElementById('todoList');
+            var taskId = button.getAttribute('data-task-id');
+
+            todoList.removeChild(todoItem);
+
+            // Save todos to local storage
+            saveTodos();
+
+            // Log task finished/removed
+            console.log("Task Finished / Removed - ID:", taskId);
+        }
+
+        function chooseRandomTodo() {
+            var todoList = document.getElementsByClassName('todo-item');
+            if (todoList.length > 0) {
+                var randomIndex = Math.floor(Math.random() * todoList.length);
+                alert("Today's Todo: " + todoList[randomIndex].getElementsByTagName('span')[0].innerText);
+            } else {
+                alert("No todos available!");
+            }
+        }
+
+        function generateTaskId() {
+            return Math.floor(Math.random() * 1000);
+        }
+
+        function saveTodos() {
+            var todoList = document.getElementById('todoList');
+            var todos = todoList.innerHTML;
+
+            // Save todos to local storage
+            localStorage.setItem('todos', todos);
+        }
+
+        function loadTodos() {
+            var todoList = document.getElementById('todoList');
+            var savedTodos = localStorage.getItem('todos');
+
+            if (savedTodos) {
+                todoList.innerHTML = savedTodos;
+            }
+        }
+    </script>
+</body>
+</html>
